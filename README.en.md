@@ -4,13 +4,13 @@
 
 # AGENTS Map
 
-AGENTS Map is a Claude Code skill, triggered with `/agents-map`, that maintains an "AGENTS.md system" for any project: the root file stays resident in context, while layer files, directory files and member files are read on demand as tasks drill down; system-level notes live in docs/. The goal is for the agent to read **accurate contracts** per task, instead of grepping the whole repo and stitching together information that may be wrong.
+AGENTS Map is an agent skill, triggered with `/agents-map`, that maintains an "AGENTS.md system" for any project: the root file stays resident in context, while layer files, directory files and member files are read on demand as tasks drill down; system-level notes live in docs/. The goal is for the agent to read **accurate contracts** per task, instead of grepping the whole repo and stitching together information that may be wrong.
 
 It is not a doc generator — a one-time scaffold whose output starts drifting the moment it is produced. AGENTS Map is a living map that maintains itself: when code changes, it converges along the diff (sync); periodically it runs a health check and proposes structural evolution (audit).
 
 ## Quick Start
 
-Requires Claude Code; the check script uses only bash + coreutils. Put this repo into your skills directory:
+It is not tied to any particular harness — the artifact it maintains, AGENTS.md, is a standard that mainstream agent runtimes (Claude Code, Codex, Cursor, etc.) all read, and the skill format itself works across tools. The check script uses only bash + coreutils. With Claude Code as an example, put this repo into your skills directory:
 
 ```bash
 git clone https://github.com/Asketisch/agents-map-skill ~/.claude/skills/agents-map

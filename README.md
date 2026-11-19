@@ -4,13 +4,13 @@
 
 # AGENTS Map 文档地图
 
-AGENTS Map 是一个 Claude Code skill,用 `/agents-map` 触发,为任意项目维护「AGENTS.md 体系」:根篇常驻上下文,层篇、目录篇、成员篇按任务下钻,系统级说明放 docs/。目标是让 Agent 按任务读到**准确的契约**,而不是靠 grep 全库拼凑可能错误的信息。
+AGENTS Map 是一个 Agent skill,用 `/agents-map` 触发,为任意项目维护「AGENTS.md 体系」:根篇常驻上下文,层篇、目录篇、成员篇按任务下钻,系统级说明放 docs/。目标是让 Agent 按任务读到**准确的契约**,而不是靠 grep 全库拼凑可能错误的信息。
 
 它不是文档生成器那种一次性脚手架——生成完那一刻就开始漂移。AGENTS Map 是一张会自己维护的活地图:代码变了它跟着 diff 收敛(sync),隔段时间它体检并提议结构演进(audit)。
 
 ## 快速开始
 
-需要 Claude Code;自检脚本只用 bash + coreutils。把本仓库放进 skills 目录:
+它不绑定某个特定 harness——产出物 AGENTS.md 是各家 Agent 运行环境(Claude Code、Codex、Cursor 等)都会读的标准;skill 格式也已跨工具通用。自检脚本只用 bash + coreutils。以 Claude Code 为例,把本仓库放进 skills 目录:
 
 ```bash
 git clone https://github.com/Asketisch/agents-map-skill ~/.claude/skills/agents-map
