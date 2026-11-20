@@ -10,7 +10,7 @@ It is not a doc generator — a one-time scaffold whose output starts drifting t
 
 ## Quick Start
 
-It is not tied to any particular harness — the artifact it maintains, AGENTS.md, is a standard that mainstream agent runtimes (Claude Code, Codex, Cursor, etc.) all read, and the skill format itself works across tools. The check script uses only bash + coreutils. With Claude Code as an example, put this repo into your skills directory:
+Loading and invocation differ between agent tools; cross-tool compatibility has not yet been tested. The check script requires Bash and Python 3. With Claude Code as an example, put this repo into your skills directory:
 
 ```bash
 git clone https://github.com/Asketisch/agents-map-skill ~/.claude/skills/agents-map
@@ -34,13 +34,13 @@ The mode argument can be omitted and is inferred from the project's state: no AG
 
 Member/directory files are the real content sources; layer files distill overviews; the root file keeps only a navigation table and a "code change → files to update" mapping table. After generation it runs the check script and spot-reverifies assertions against code (anti-guessing).
 
-**sync — converge drift along the diff** — anchors on the last commit that touched any AGENTS.md and routes subsequent code changes to the {file, section} that needs updating:
+**sync — converge drift along the diff** — uses each document’s last commit as its own heuristic baseline and routes subsequent code changes to the {file, section} that needs updating:
 
 ```
 /agents-map sync
 ```
 
-Three signal layers (structural → mapping table → assertion comparison) locate each change; build artifacts and submodule mirrors are on the exclusion list and never edited; drift patterns a human newly discovers go into the learning loop `LEARNINGS.md`.
+Three signal layers (structural → mapping table → assertion comparison) locate each change; build artifacts and submodule mirrors are on the exclusion list and never edited; uncertain findings are reported for review.
 
 **audit — health report and structural evolution** — a full check that does not depend on git diff, read-only:
 
@@ -53,9 +53,9 @@ Checks links, line budgets, section completeness and index closure, plus a "high
 ## Core Features
 
 - **Progressive disclosure** — the root file is resident, layer/member files are read on demand; every file has a line budget (root: 120–180, hard cap 200), so context is never drowned.
-- **Dynamic splitting** — no fixed tree depth; a subtree splits by module once its weighted code volume passes ~30k, thresholds calibrated on a real 45-crate Rust workspace.
+- **Dynamic splitting** — no fixed tree depth; weighted code volume is one signal to review for a possible split, thresholds calibrated on a real 45-crate Rust workspace.
 - **Drift routing** — diffs route precisely to the target section through three signal layers; only the drifted part changes, each file's structure and voice stay intact.
-- **Self-iterating learning** — `LEARNINGS.md` with four fixed sections (threshold calibration / template tweaks / drift patterns / project exceptions) and three anti-bloat gates: a 120-line cap, promotion at seen≥2, and human review before promotion.
+- **Feedback** — project-specific exceptions stay in the project; maintainers review general improvements.
 - **Multi-shape fit** — Rust workspace / JS monorepo / Python / Go each get their own vocabulary mapping and file skeletons; doc language follows the target project rather than defaulting to Chinese.
 - **Hard rules** — only assert what actually exists in the code, no speculative docs; AGENTS.md inside submodule mirrors is never edited.
 
@@ -72,3 +72,7 @@ Checks links, line budgets, section completeness and index closure, plus a "high
 ## Repository
 
 <https://github.com/Asketisch/agents-map-skill>
+
+## Verification and limitations
+
+Run `python3 -m unittest discover -s tests` for checker fixtures. Sync baselines and semantic routing are heuristics, not proof that documentation is current. Shallow or missing history requires a full review. Cross-tool compatibility and task outcomes have not been validated. The checker requires Bash and Python 3.

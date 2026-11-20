@@ -10,7 +10,7 @@ AGENTS Map 是一个 Agent skill,用 `/agents-map` 触发,为任意项目维护�
 
 ## 快速开始
 
-它不绑定某个特定 harness——产出物 AGENTS.md 是各家 Agent 运行环境(Claude Code、Codex、Cursor 等)都会读的标准;skill 格式也已跨工具通用。自检脚本只用 bash + coreutils。以 Claude Code 为例,把本仓库放进 skills 目录:
+它不绑定某个特定 harness——产出物 AGENTS.md 是各家 Agent 运行环境(Claude Code、Codex、Cursor 等)都会读的标准;不同工具的加载和触发方式可能不同，尚未进行跨工具兼容性实测。自检脚本需要 bash 和 Python 3。以 Claude Code 为例,把本仓库放进 skills 目录:
 
 ```bash
 git clone https://github.com/Asketisch/agents-map-skill ~/.claude/skills/agents-map
@@ -22,7 +22,7 @@ git clone https://github.com/Asketisch/agents-map-skill ~/.claude/skills/agents-
 /agents-map
 ```
 
-模式参数可省略,由项目现状自动推断:没有任何 AGENTS.md 走 init,已有体系走 sync。sync 会先输出漂移报告、经你确认后才逐条精确编辑,不全文重写;audit 只读,不改动任何东西。
+模式参数可省略,由项目现状自动推断:没有任何 AGENTS.md 走 init,已有体系走 sync。sync 会先输出漂移报告、按用户授权逐条精确编辑,不全文重写;audit 只读,不改动任何东西。
 
 ## 三种用法
 
@@ -34,13 +34,13 @@ git clone https://github.com/Asketisch/agents-map-skill ~/.claude/skills/agents-
 
 成员篇/目录篇是真正的内容源,层篇提炼速览,根篇只留导航表和「代码改动 → 同步更新」映射表。生成后跑自检脚本,再随机抽篇逐断言回查代码(反猜测)。
 
-**sync —— 按 diff 同步漂移** —— 以最近一次触及 AGENTS.md 的提交为锚,把其后的代码变更路由到该更新的篇与节:
+**sync —— 按 diff 同步漂移** —— 以各篇最近一次提交为独立参考锚,把其后的代码变更路由到该更新的篇与节:
 
 ```
 /agents-map sync
 ```
 
-三层信号(结构性 → 映射表 → 断言比对)逐条定位;构建产物和 submodule 镜像目录在排除名单里,绝不代改;人工新发现的漂移模式会进学习回路 `LEARNINGS.md`。
+三层信号(结构性 → 映射表 → 断言比对)逐条定位;构建产物和 submodule 镜像目录在排除名单里,绝不代改;不确定的漂移会列为待审。
 
 **audit —— 健康体检与结构演进** —— 不依赖 git diff 的全量检查,只读:
 
@@ -48,14 +48,14 @@ git clone https://github.com/Asketisch/agents-map-skill ~/.claude/skills/agents-
 /agents-map audit
 ```
 
-查链接、行数预算、章节完整、索引闭合,外加「高变更目录 × 文档新鲜度」矩阵揪出沉默漂移,输出下拆/上合/生长建议。建议不自动执行,经确认后由 init 或 sync 落地。
+查链接、行数提示和根篇可达性,外加「高变更目录 × 文档新鲜度」矩阵揪出沉默漂移,输出下拆/上合/生长建议。建议不自动执行,经确认后由 init 或 sync 落地。
 
 ## 核心特性
 
 - **渐进式披露** —— 根篇常驻、层篇/成员篇按需读,每篇有行数预算(根篇 120–180,硬上限 200),不拿全文喂上下文。
-- **动态拆分** —— 树不设固定层数,子树加权代码量越过约 30k 即按模块下拆;阈值来自 45-crate Rust workspace 实测标定。
+- **动态拆分** —— 树不设固定层数,子树规模等指标用于提示是否需要按模块下拆;阈值来自 45-crate Rust workspace 实测标定。
 - **漂移路由** —— diff 经三层信号精确落到目标篇节,只改漂移处,保持各篇章节序与文风。
-- **自迭代学习** —— `LEARNINGS.md` 四节固定(阈值校准/模板调整/漂移模式/项目例外),三闸防膨胀:120 行硬上限、seen≥2 建议晋升、晋升需人审。
+- **经验回流** —— 项目例外留在项目中，通用经验由维护者审查。
 - **多形态适配** —— Rust workspace / JS monorepo / Python / Go 各有词汇映射与篇型骨架;文档语言跟随目标项目,不默认套中文。
 - **硬规则** —— 只断言代码中实际存在的内容,不写推测性文档;submodule 镜像里的 AGENTS.md 永不编辑。
 
@@ -72,3 +72,7 @@ git clone https://github.com/Asketisch/agents-map-skill ~/.claude/skills/agents-
 ## 仓库
 
 <https://github.com/Asketisch/agents-map-skill>
+
+## 验证与局限
+
+运行 `python3 -m unittest discover -s tests` 检查基础场景。同步锚点和语义路由均为启发式，不能证明文档没有漂移；浅克隆或缺少历史时需要完整审查。尚未完成跨工具兼容性和任务效果的实测。
