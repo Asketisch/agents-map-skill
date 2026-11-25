@@ -7,19 +7,31 @@ import sys
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
-root = Path(sys.argv[1] if len(sys.argv) > 1 else '.').resolve()
-if not root.is_dir() or len(sys.argv) > 2:
-    print('Usage: check_agents_docs.sh [repo_root]', file=sys.stderr)
+argv = list(sys.argv[1:])
+structure = '--structure' in argv
+if structure:
+    argv.remove('--structure')
+root = Path(argv[0] if argv else '.').resolve()
+if not root.is_dir() or len(argv) > 1:
+    print('Usage: check_agents_docs.sh [--structure] [repo_root]', file=sys.stderr)
     sys.exit(2)
 excluded = {'.git', 'target', 'node_modules', 'dist', 'build', 'vendor'}
+SOURCE_EXTS = {'.rs', '.py', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.go', '.rb', '.java', '.kt', '.c', '.h', '.cpp', '.hpp', '.cs', '.swift', '.php'}
+STRUCT_EXCLUDE_DIRS = excluded | {'tests', 'test', 'spec', 'docs', 'examples', 'benches', 'migrations'}
+STRUCT_MIN_SOURCES = 20
+TEST_NAME_RE = re.compile(r'^(test_|.*[_\.-](test|spec)\.|\w*_test\.)')
 submodules = set()
 if (root / '.gitmodules').is_file():
     result = subprocess.run(['git', 'config', '-f', str(root / '.gitmodules'), '--get-regexp', r'\.path$'], capture_output=True, text=True)
     submodules = {line.split(None, 1)[1] for line in result.stdout.splitlines() if len(line.split(None, 1)) == 2}
+
+def prunable(base, d, extra=()):
+    return d in excluded or d in extra or (base / d / '.git').is_file() or (base / d).relative_to(root).as_posix() in submodules
+
 docs = []
 for current, dirs, files in os.walk(root, followlinks=False):
     base = Path(current)
-    dirs[:] = [d for d in dirs if d not in excluded and not (base / d / '.git').is_file() and (base / d).relative_to(root).as_posix() not in submodules]
+    dirs[:] = [d for d in dirs if not prunable(base, d)]
     if 'AGENTS.md' in files:
         docs.append(base / 'AGENTS.md')
 docs.sort()
@@ -68,5 +80,15 @@ if start in edges:
             errors += 1
 else:
     print('  [warn ] 无根篇，无法检查从根篇的可达性')
+if structure:
+    # Advisory only, never counted in errors: a flat directory with many direct
+    # source files is a code-structure signal (see references/restructure.md).
+    for current, dirs, files in os.walk(root, followlinks=False):
+        base = Path(current)
+        dirs[:] = [d for d in dirs if not prunable(base, d, STRUCT_EXCLUDE_DIRS)]
+        count = sum(1 for f in files if Path(f).suffix in SOURCE_EXTS and not TEST_NAME_RE.match(f))
+        if count > STRUCT_MIN_SOURCES:
+            print(f'  [struct ] {base.relative_to(root).as_posix()}: {count} 个直接源文件(>{STRUCT_MIN_SOURCES})，评估按功能分子目录(见 references/restructure.md)')
+            dirs[:] = []
 print(f'AGENTS.md 自检({root}): {len(docs)} 篇 | error={errors}')
 sys.exit(1 if errors else 0)

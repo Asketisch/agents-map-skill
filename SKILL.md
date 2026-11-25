@@ -47,7 +47,7 @@ trigger: /agents-map
 不依赖 git diff,全量体检:
 
 ```bash
-bash scripts/check_agents_docs.sh <repo>     # 链接/行数/章节/索引闭合
+bash scripts/check_agents_docs.sh --structure <repo>   # 链接/行数/章节/索引闭合 + 平铺目录信号(advisory)
 git log --name-only --since=3.months | ...   # 高变更目录 × 文档新鲜度矩阵
 ```
 
