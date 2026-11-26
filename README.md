@@ -10,7 +10,15 @@ AGENTS Map 是一个 Agent skill,用 `/agents-map` 触发,为任意项目维护�
 
 ## 快速开始
 
-它不绑定某个特定 harness——产出物 AGENTS.md 是各家 Agent 运行环境(Claude Code、Codex、Cursor 等)都会读的标准;不同工具的加载和触发方式可能不同，尚未进行跨工具兼容性实测。自检脚本需要 bash 和 Python 3。以 Claude Code 为例,把本仓库放进 skills 目录:
+它不绑定某个特定 harness——产出物 AGENTS.md 是各家 Agent 运行环境(Claude Code、Codex、Cursor 等)都会读的标准;不同工具的加载和触发方式可能不同，尚未进行跨工具兼容性实测。自检脚本需要 bash 和 Python 3。
+
+本 skill 已上架 [skills.sh](https://www.skills.sh/asketisch/agents-map-skill/agents-map),推荐用 [skills CLI](https://skills.sh) 安装,它会按你的 agent 工具自动落到正确的 skills 目录:
+
+```bash
+npx skills add https://github.com/asketisch/agents-map-skill --skill agents-map
+```
+
+需要更新时重跑这条命令即可。也可以手动安装,以 Claude Code 为例,把本仓库放进 skills 目录:
 
 ```bash
 git clone https://github.com/Asketisch/agents-map-skill ~/.claude/skills/agents-map
@@ -87,7 +95,8 @@ audit 或此命令产出**搬移提案**(文件或子目录→目标位置,逐�
 
 ## 仓库
 
-<https://github.com/Asketisch/agents-map-skill>
+- GitHub: <https://github.com/Asketisch/agents-map-skill>
+- skills.sh: <https://www.skills.sh/asketisch/agents-map-skill/agents-map>
 
 ## 验证与局限
 

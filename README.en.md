@@ -10,7 +10,15 @@ It is not a doc generator — a one-time scaffold whose output starts drifting t
 
 ## Quick Start
 
-Loading and invocation differ between agent tools; cross-tool compatibility has not yet been tested. The check script requires Bash and Python 3. With Claude Code as an example, put this repo into your skills directory:
+Loading and invocation differ between agent tools; cross-tool compatibility has not yet been tested. The check script requires Bash and Python 3.
+
+This skill is listed on [skills.sh](https://www.skills.sh/asketisch/agents-map-skill/agents-map). The recommended way to install it is the [skills CLI](https://skills.sh), which drops the skill into the right directory for your agent tool automatically:
+
+```bash
+npx skills add https://github.com/asketisch/agents-map-skill --skill agents-map
+```
+
+Re-run the same command to update. Alternatively, install manually — with Claude Code as an example, put this repo into your skills directory:
 
 ```bash
 git clone https://github.com/Asketisch/agents-map-skill ~/.claude/skills/agents-map
@@ -87,7 +95,8 @@ Infinite subdivision must stay drillable: each file is 40–130 lines with one n
 
 ## Repository
 
-<https://github.com/Asketisch/agents-map-skill>
+- GitHub: <https://github.com/Asketisch/agents-map-skill>
+- skills.sh: <https://www.skills.sh/asketisch/agents-map-skill/agents-map>
 
 ## Verification and limitations
 
