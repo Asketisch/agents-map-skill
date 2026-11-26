@@ -7,9 +7,17 @@
 | 形态 | 树的中间层叫 | 叶子单元叫 | 入口文件 |
 |---|---|---|---|
 | Rust workspace | 层 | crate | `src/lib.rs` |
-| JS monorepo | 组(或按包域) | package | `src/index.ts` |
+| JS/TS monorepo | 组(或按包域) | package | `src/index.ts` |
 | Python(src 布局) | 域 | subpackage | `__init__.py` |
-| Go(multi-module) | 组 | module / package | `doc.go` / 包目录 |
+| Go | 组 | module / package | `doc.go` / 包目录 |
+| JVM 多模块 | 组 | module | 构建文件指定的源集根 |
+| .NET | 组 | project | `*.csproj` 对应的入口 |
+| SwiftPM | — | target | `Package.swift` 里的 target 路径 |
+| C/C++ | 目录 | 目录 | 公开头文件 |
+| PHP Composer | — | package | `composer.json` 的 autoload |
+| RubyGems | — | lib | `lib/` |
+
+多语言仓库按子树分别用上表,不选一行当全仓词汇。没有中间层的形态,模板 B 整篇省略。
 
 模板中以 `<单元>` / `<组>` 行文,生成时换成左列对应词。
 
@@ -32,7 +40,7 @@
 
 <一句话:这是什么、给谁用>。
 - <语言/运行时/版本约束>
-- <N> 个 <单元> workspace,按 <M> 组分组于 `<目录>/<组>/<单元>/`
+- <若项目按组收纳单元:N 个 <单元>,按 <M> 组放在 `<目录>/<组>/<单元>/`。单包项目删掉这句>
 
 ## AGENTS.md 体系导航
 
@@ -54,7 +62,7 @@
 
 ## 架构
 
-### Workspace 分层(依赖方向自上而下)
+### 依赖分层(项目确实分层时才写这一节;单包项目整节删去)
 
 | <组> | <单元> | 职责 |
 |---|---|---|
@@ -100,7 +108,7 @@
 ## 模板 B:组篇(层篇/路由篇——**任意深度的非叶节点通用**)
 
 ```markdown
-# <组名> 层 AGENTS.md
+# <组名> AGENTS.md
 
 > **何时读我**:在 `<目录>/<组>/` 下工作——<改哪些类型/装配/分发>、或排查<典型跨边界问题>时,读本篇。
 
