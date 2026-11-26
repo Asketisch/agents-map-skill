@@ -22,9 +22,9 @@ git clone https://github.com/Asketisch/agents-map-skill ~/.claude/skills/agents-
 /agents-map
 ```
 
-模式参数可省略,由项目现状自动推断:没有任何 AGENTS.md 走 init,已有体系走 sync。sync 会先输出漂移报告、按用户授权逐条精确编辑,不全文重写;audit 只读,不改动任何东西。
+模式参数可省略,由项目现状自动推断:没有任何 AGENTS.md 走 init,已有体系走 sync。sync 会先输出漂移报告、按用户授权逐条精确编辑,不全文重写;audit 只读,输出报告与提案;代码搬移只发生在显式批准的门禁阶段(restructure)。
 
-## 三种用法
+## 三种模式 + 一个门禁阶段
 
 **init —— 首次建档 / 补齐缺失层** —— 扫描项目形态与量级,逐节点评估容量得出目标树形,再自底向上生成:
 
@@ -48,12 +48,25 @@ git clone https://github.com/Asketisch/agents-map-skill ~/.claude/skills/agents-
 /agents-map audit
 ```
 
-查链接、行数提示和根篇可达性,外加「高变更目录 × 文档新鲜度」矩阵揪出沉默漂移,输出下拆/上合/生长建议。建议不自动执行,经确认后由 init 或 sync 落地。
+查链接、行数提示、根篇可达性和平铺目录信号(`--structure`),外加「高变更目录 × 文档新鲜度」矩阵揪出沉默漂移,输出下拆/上合/生长建议。建议不自动执行,经确认后由 init 或 sync 落地;涉及代码结构的是搬移提案,交给 restructure。
+
+**restructure —— 按功能重组代码(需批准)** —— 某目录平铺源文件过多(约 >20)且无功能子结构时,单靠文档枚举违背渐进披露的初衷,该动的是目录本身:
+
+```
+/agents-map restructure
+```
+
+audit 或此命令产出**搬移提案**(文件→子目录,逐文件带证据与风险标注),逐目录批准后执行:每簇一批纯 `git mv` 提交,随批跑构建+测试,失败即回滚该批;文档树在同一阶段跟随新结构生长。Go 仓默认仅提案。sync 永不移动代码。
+
+## 为什么动结构
+
+细分精神要能无限下钻:每篇 AGENTS.md 40–130 行、导航表每项一行,**>15 个直接子项必然超限**——所以"每篇都短"必须由目录结构保证,而不是压缩文字。目录按功能拆分后,agent 定位代码就像读 skill 一样逐层下钻,精准命中,永远不必吞下一篇长枚举。
 
 ## 核心特性
 
 - **渐进式披露** —— 根篇常驻、层篇/成员篇按需读,每篇有行数预算(根篇 120–180,硬上限 200),不拿全文喂上下文。
-- **动态拆分** —— 树不设固定层数,子树规模等指标用于提示是否需要按模块下拆;阈值来自 45-crate Rust workspace 实测标定。
+- **动态拆分** —— 树不设固定层数,子树规模、公开契约数、**目录直接平铺源文件数**等信号提示是否需要下拆;细分由目录结构承载,不靠长枚举文档;阈值来自 45-crate Rust workspace 实测标定。
+- **结构演进落地(受控)** —— 目录该拆而没得拆时,restructure 阶段带证据提案、逐目录批准、每批一提交随批验证、失败即回滚;skill 从不在无人批准时动代码。
 - **漂移路由** —— diff 经三层信号精确落到目标篇节,只改漂移处,保持各篇章节序与文风。
 - **经验回流** —— 项目例外留在项目中，通用经验由维护者审查。
 - **多形态适配** —— Rust workspace / JS monorepo / Python / Go 各有词汇映射与篇型骨架;文档语言跟随目标项目,不默认套中文。
@@ -63,10 +76,11 @@ git clone https://github.com/Asketisch/agents-map-skill ~/.claude/skills/agents-
 
 | 文档 | 内容 |
 |------|------|
-| [SKILL.md](SKILL.md) | skill 主定义:Phase 0 推断与三个模式的完整流程 |
+| [SKILL.md](SKILL.md) | skill 主定义:Phase 0 推断、三个模式与 restructure 阶段的完整流程 |
 | [references/templates.md](references/templates.md) | 四种 AGENTS.md 篇型骨架与形态→词汇映射 |
 | [references/splitting.md](references/splitting.md) | 形态识别与动态拆分规则、行数预算、阈值标定 |
 | [references/sync-routing.md](references/sync-routing.md) | sync 的三层信号路由算法与噪声排除黑名单 |
+| [references/restructure.md](references/restructure.md) | 代码搬移协议:聚类取证、批准门、执行与回滚、语言机制、禁移清单 |
 | [scripts/check_agents_docs.sh](scripts/check_agents_docs.sh) | 体系自检脚本:链接/行数/章节/索引闭合 |
 
 ## 仓库
